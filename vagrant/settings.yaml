@@ -1,0 +1,34 @@
+---
+# cluster_name is used to group the nodes in a folder within VirtualBox:
+cluster_name: Kubernetes Cluster
+master_hostname: master
+worker_node_hostname: node
+network:
+  # Worker IPs are simply incremented from the control IP.
+  control_ip: 10.0.0.10
+  node_ip: 10.0.0.11
+  dns_servers:
+    - 8.8.8.8
+    - 1.1.1.1
+  pod_cidr: 172.16.1.0/16
+  service_cidr: 172.17.1.0/18
+nodes:
+  control:
+    cpu: 2
+    memory: 4096
+  workers:
+    count: 1
+    cpu: 1
+    memory: 2048
+# Mount additional shared folders from the host into each virtual machine.
+# Note that the project directory is automatically mounted at /vagrant.
+shared_folders:
+  - host_path: "."
+    vm_path: "/vagrant/configs"
+software:
+  box: debian/bullseye64
+  calico: 3.25.0
+  # To skip the dashboard installation, set its version to an empty value or comment it out:
+  dashboard: 2.7.0
+  kubernetes: 1.26.1-00
+  os: Debian 11

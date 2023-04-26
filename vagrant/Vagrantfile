@@ -1,0 +1,73 @@
+require "yaml"
+settings = YAML.load_file "settings.yaml"
+
+Vagrant.configure("2") do |config|
+  
+  # Configura a máquina virtual master
+  config.vm.define "master" do |master|
+    master.vm.box = settings["software"]["box"]
+    master.vm.network "private_network", ip: settings["network"]["control_ip"]
+    master.vm.hostname = settings['master_hostname']
+    
+    master.vm.provider "virtualbox" do |vb|
+      vb.cpus = settings["nodes"]["control"]["cpu"]
+      vb.memory = settings["nodes"]["control"]["memory"]
+      
+      if settings["cluster_name"] && settings["cluster_name"] != ""
+        vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      end
+    end
+    
+    if settings["shared_folders"]
+      settings["shared_folders"].each do |shared_folder|
+        master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+      end
+    end
+    
+    master.vm.provision "shell",
+      env: {  
+        "CALICO_VERSION" => settings["software"]["calico"],
+        "CONTROL_IP" => settings["network"]["control_ip"],
+        "POD_CIDR" => settings["network"]["pod_cidr"],
+        "SERVICE_CIDR" => settings["network"]["service_cidr"],
+        "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+        "ENVIRONMENT" => settings["environment"],
+        "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+        "OS" => settings["software"]["os"]
+      },
+      path: "scripts/master.sh"
+  end
+
+  # Configura a máquina virtual node
+  config.vm.define "node" do |node|
+    node.vm.box = settings["software"]["box"]
+    node.vm.network "private_network", ip: settings["network"]["node_ip"]
+    node.vm.hostname = settings["worker_node_hostname"]
+
+    if settings["shared_folders"]
+      settings["shared_folders"].each do |shared_folder|
+        node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+      end
+    end
+    
+    node.vm.provider "virtualbox" do |vb|
+      vb.cpus = settings["nodes"]["workers"]["cpu"]
+      vb.memory = settings["nodes"]["workers"]["memory"]
+      
+      if settings["cluster_name"] && settings["cluster_name"] != ""
+        vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      end
+    end
+    
+    node.vm.provision "shell",
+      env: {
+        "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+        "ENVIRONMENT" => settings["environment"],
+        "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+        "OS" => settings["software"]["os"]
+      },
+      path: "scripts/node.sh"
+  end
+end

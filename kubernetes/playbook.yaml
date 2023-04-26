@@ -1,0 +1,8 @@
+---
+- name: Deploy minha aplicação
+  hosts: localhost
+  gather_facts: no
+  vars:
+    kubeconfig: "/path/to/kubeconfig.yaml"
+  roles:
+    - kubernetes

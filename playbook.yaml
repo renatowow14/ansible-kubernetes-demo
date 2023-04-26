@@ -1,4 +1,4 @@
 ---
 - hosts: k8scluster
   roles:
-    - k8sworker
+    - kubernetes

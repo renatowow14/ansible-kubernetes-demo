@@ -23,7 +23,7 @@ if ! id -nG | grep -qw vboxusers; then
     sudo usermod -aG vboxusers $USER
 fi
 
-cd Vagrant/
+cd vagrant/
 
 vagrant up 
 

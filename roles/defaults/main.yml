@@ -1,0 +1,10 @@
+---
+kubernetes_namespace: default
+kubernetes_labels:
+  app: minha-aplicacao
+kubernetes_deployment_name: minha-aplicacao
+kubernetes_deployment_image: nginx
+kubernetes_deployment_replicas: 3
+kubernetes_service_name: minha-aplicacao
+kubernetes_service_type: LoadBalancer
+kubernetes_service_port: 80

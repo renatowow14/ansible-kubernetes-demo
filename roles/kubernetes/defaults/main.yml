@@ -8,3 +8,5 @@ kubernetes_deployment_replicas: 3
 kubernetes_service_name: minha-aplicacao
 kubernetes_service_type: LoadBalancer
 kubernetes_service_port: 80
+kubeconfig: "/home/vagrant/.kube/config"
+ansible_python_interpreter: /usr/bin/python3

@@ -9,6 +9,7 @@
       metadata:
         name: "{{ kubernetes_deployment_name }}"
         labels: "{{ kubernetes_labels }}"
+        namespace: "{{ kubernetes_namespace }}"
       spec:
         replicas: "{{ kubernetes_deployment_replicas }}"
         selector:
@@ -18,10 +19,11 @@
             labels: "{{ kubernetes_labels }}"
           spec:
             containers:
-            - name: "{{ kubernetes_deployment_name }}"
-              image: "{{ kubernetes_deployment_image }}"
-              ports:
-              - containerPort: "{{ kubernetes_service_port }}"
+              - name: "{{ kubernetes_deployment_name }}"
+                image: "{{ kubernetes_deployment_image }}"
+                ports:
+                  - containerPort: "{{ kubernetes_service_port }}"
+  become: yes
 
 - name: Deploy meu serviço
   community.kubernetes.k8s:
@@ -32,10 +34,12 @@
       apiVersion: v1
       metadata:
         name: "{{ kubernetes_service_name }}"
+        namespace: "{{ kubernetes_namespace }}"
       spec:
         selector: "{{ kubernetes_labels }}"
         ports:
-        - name: http
-          port: "{{ kubernetes_service_port }}"
-          targetPort: "{{ kubernetes_service_port }}"
+          - name: http
+            port: "{{ kubernetes_service_port }}"
+            targetPort: "{{ kubernetes_service_port }}"
         type: "{{ kubernetes_service_type }}"
+  become: yes

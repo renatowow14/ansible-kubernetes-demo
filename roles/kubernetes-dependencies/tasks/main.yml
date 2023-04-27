@@ -1,0 +1,14 @@
+---
+- name: "Instala pacotes de dependencias do sistema operacional"
+  apt:
+    name: "{{ item }}"
+    state: latest
+  become: yes
+  with_items:
+    - python3-pip
+
+- name: Install kubernetes library
+  pip:
+    name: kubernetes
+    state: present
+  become: yes

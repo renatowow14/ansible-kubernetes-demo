@@ -1,2 +1,3 @@
-collections:
-  - community.kubernetes
+---
+dependencies:
+  - kubernetes-dependencies
